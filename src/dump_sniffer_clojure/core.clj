@@ -1,11 +1,7 @@
 (ns dump-sniffer-clojure.core
+  (require [clojure.string :as str])
+  (require [clojure.tools.cli :as cli])
   (:gen-class))
-  (require '[clojure.string :as str])
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
 
 (defn dump-sniffer-table-names [fname]
   (->> (slurp fname)
@@ -13,10 +9,11 @@
        (vec)
        (map last)))
 
-;(defn dump-sniffer-table-names [fname]
-  ;(map
-    ;last
-    ;(vec
-      ;(re-seq
-        ;#"(?i)create table `(.*?)`"
-        ;(slurp fname)))))
+(defn -main
+  [& args]
+  (let [options (cli/parse-opts args [["-t" "--table-names"]])]
+    (if (get-in options [:options :table-names])
+      (->> (dump-sniffer-table-names (last args))
+           (clojure.string/join "\n")
+           println)
+      (println "doing nothing"))))
